@@ -11,7 +11,7 @@ class BiggerStrongRestrict;
 
 class RestrictBase {
 public:
-	double param;
+	double param; // b
 	vector<double> row_matr;
 	RestrictBase(vector<double>&& row_matr, double param) : row_matr(std::move(row_matr)), param(param) {}
 	virtual bool checkCorrect(vector<double> x) = 0;
@@ -25,6 +25,8 @@ public:
 	}
 
 	virtual EqwRestrict* toEqw() = 0;
+	virtual RestrictBase* toLower() = 0;
+	virtual RestrictBase* toBigger() = 0;
 
 	int getIndexNaturalValue() {
 		for (int i = 0; i < row_matr.size(); i++) {
@@ -65,6 +67,14 @@ public:
 		return this;
 	}
 
+	RestrictBase* toLower() {
+		return toEqw();
+	}
+
+	RestrictBase* toBigger() {
+		return toEqw();
+	}
+
 	void print() {
 		RestrictBase::print();
 		cout << "==" << param << endl;
@@ -90,6 +100,14 @@ public:
 	EqwRestrict* toEqw() override {
 		row_matr.push_back(1);
 		return new EqwRestrict(move(row_matr), param);
+	}
+
+	RestrictBase* toLower() {
+		return this;
+	}
+
+	RestrictBase* toBigger() {
+		return multiplyOnNumber(-1);
 	}
 
 	void print() {
@@ -123,6 +141,14 @@ public:
 	EqwRestrict* toEqw() override {
 		row_matr.push_back(-1);
 		return new EqwRestrict(move(row_matr), param);
+	}
+
+	RestrictBase* toLower() {
+		return multiplyOnNumber(-1);
+	}
+
+	RestrictBase* toBigger() {
+		return this;
 	}
 
 	void print() {

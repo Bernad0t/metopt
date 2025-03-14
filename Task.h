@@ -3,13 +3,21 @@
 #include <iostream>
 #include <algorithm>
 #include "./OrganizedToCanon.h"
+#include "./Utils.h"
 
-class Task { 
+//class Simplex;
+
+class TaskBase {
+protected:
 	vector<RestrictBase*> s_conditions;
 	vector<RestrictBase*> x_conditions; // должно быть отсортированным по xi, также должно быть >= 0
 	vector<double> goal;
+	bool isMinTask;
 
 public:
+	TaskBase(bool isMin) {
+		isMinTask = isMin;
+	}
 	void addRestriction(RestrictBase* condition) {
 		s_conditions.push_back(condition);
 	}
@@ -22,10 +30,8 @@ public:
 		goal = new_goal;
 	}
 
-	void transformToCanonicalForm() {
-		OrganizedToCanon toCanon(s_conditions, x_conditions, goal);
-		toCanon.createCanonForm();
-		//toCanon.print();
+	void invertGoal() {
+		Utils::invertGoal(goal);
 	}
 
 	void print() {
@@ -44,7 +50,7 @@ public:
 		cout << endl;
 	}
 
-	~Task() {
+	~TaskBase() {
 		for (auto* cond : s_conditions) {
 			delete cond;
 		}

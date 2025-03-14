@@ -1,20 +1,11 @@
 #pragma once
 #include "./Restrict.h"
 #include <iostream>
+#include "./Utils.h"
+#include "Task.h"
 
-class OrganizedToCanon {
-    vector<RestrictBase*>& s_conditions;
-    vector<RestrictBase*>& x_conditions; // должно быть отсортированным по xi, также должно быть >= 0
-    vector<double>& goal;
-
-    vector<vector<double>> getMatrFromConditions() {
-        vector<vector<double>> result;
-        for (auto s : s_conditions) {
-            result.push_back(s->row_matr);
-        }
-        return result;
-    }
-
+class OrganizedToCanon: public TaskBase {
+protected:
     int rowReduction(vector<vector<double>>& mat) {
         int n = mat.size();    // Число строк
         int m = mat[0].size(); // Число столбцов
@@ -54,17 +45,11 @@ class OrganizedToCanon {
 
     // Функция для проверки матрицы на полный ранг
     bool isFullRank() {
-        vector<vector<double>> temp = getMatrFromConditions(); // Создаем копию матрицы для изменения
+        vector<vector<double>> temp = Utils::getMatrFromConditions(s_conditions); // Создаем копию матрицы для изменения
         int n = temp.size();
         int m = temp[0].size();
         int rank = rowReduction(temp);
         return rank == min(n, m);
-    }
-
-    void maximize() {
-        for (double& g : goal) {
-            g *= -1;
-        }
     }
 
     void doParamsNatural() {
@@ -133,31 +118,14 @@ class OrganizedToCanon {
     }
 
 public:
-    OrganizedToCanon(vector<RestrictBase*>& s_conditions, vector<RestrictBase*>& x_conditions, vector<double>& goal)
-        : s_conditions(s_conditions), x_conditions(x_conditions), goal(goal) {}
-
-    /*void print() {
-        cout << "s_codn" << endl;
-        for (auto& condition : s_conditions) {
-            condition->print();
-        }
-        cout << "\nx_codn" << endl;
-        for (auto& condition : x_conditions) {
-            condition->print();
-        }
-        cout << "\ngoal" << endl;
-        for (int i = 0; i < goal.size(); i++) {
-            cout << goal[i] << " ";
-        }
-        cout << endl;
-    }*/
-
+    OrganizedToCanon(bool isMin): TaskBase(isMin){}
     void createCanonForm() {
         if (!isFullRank()) {
             throw runtime_error("Матрица не имеет полный ранг. Задача не может быть преобразована в канонический вид.");
         }
 
-        maximize();
+        if (isMinTask)
+            Utils::invertGoal(goal);
         doParamsNatural();
         makeUnknownNatural();
 

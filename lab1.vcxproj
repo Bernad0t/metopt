@@ -127,9 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DualTask.h" />
     <ClInclude Include="OrganizedToCanon.h" />
     <ClInclude Include="Restrict.h" />
+    <ClInclude Include="Simplex.h" />
     <ClInclude Include="Task.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
