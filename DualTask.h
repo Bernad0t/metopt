@@ -2,11 +2,7 @@
 #include "./Utils.h"
 #include "./Task.h"
 
-class Simplex;
-
 class DualTask: public OrganizedToCanon {
-protected:
-	friend class Simplex;
 public:
 	DualTask(vector<RestrictBase*>& s_conditions, vector<RestrictBase*>& x_conditions, vector<double>& goal, bool isMin)
 		: OrganizedToCanon(isMin){
@@ -38,8 +34,8 @@ public:
 		}
 	}
 
-	int getIndexMainColumn() override {
-		int minElement = goal[0]; // Предположим, что первый элемент максимален
+	int getIndexMainColumn() override { // < 0
+		int minElement = goal[0]; // Предположим, что первый элемент min
 
 		for (int i = 1; i < goal.size(); ++i) {
 			if (goal[i] < minElement) {
@@ -47,7 +43,7 @@ public:
 			}
 		}
 
-		return minElement;
+		return minElement < 0 ? minElement : 0;
 	}
 
 	DualTask* goToAgainst() override;
@@ -96,12 +92,12 @@ public:
 			}
 		}
 
-		return maxElement;
+		return maxElement > 0 ? maxElement : 0;
 	}
 };
 
 DualTask* DirectTask::goToAgainst() {
-	vector<vector<double>> transp_matr = Utils::transposeMatrix(Utils::getMatrFromConditions(s_conditions));
+	vector<vector<double>> transp_matr = Utils::transposeMatrix(Utils::getMatrFromConditions(s_conditions)); // не меняет this
 	vector<RestrictBase*> s_dual_conditions;
 	vector<RestrictBase*> x_dual_conditions;
 	for (int i = 0; i < goal.size(); i++) {

@@ -4,8 +4,11 @@
 #include "./Utils.h"
 #include "Task.h"
 
+class Simplex;
+
 class OrganizedToCanon: public TaskBase {
 protected:
+    friend class Simplex;
     int rowReduction(vector<vector<double>>& mat) {
         int n = mat.size();    // Число строк
         int m = mat[0].size(); // Число столбцов
@@ -118,7 +121,7 @@ protected:
     }
 
 public:
-    OrganizedToCanon(bool isMin): TaskBase(isMin){}
+    using TaskBase::TaskBase;
     void createCanonForm() {
         if (!isFullRank()) {
             throw runtime_error("Матрица не имеет полный ранг. Задача не может быть преобразована в канонический вид.");
@@ -146,6 +149,10 @@ public:
             vector<double> new_x = vector<double>(x_conditions.size() + 1, 0);
             new_x[new_x.size() - 1] = 1;
             x_conditions.push_back(new BiggerStrongRestrict(move(new_x), 0));
+        }
+
+        for (int i = goal.size(); i < x_conditions.size(); i++) {
+            goal.push_back(0);
         }
     }
 };

@@ -3,7 +3,7 @@
 
 class Utils {
 public:
-	static vector<vector<double>> getMatrFromConditions(vector<RestrictBase*>& s_conditions) {
+	static vector<vector<double>> getMatrFromConditions(const vector<RestrictBase*>& s_conditions) {
         vector<vector<double>> result;
         for (auto s : s_conditions) {
             result.push_back(s->row_matr);

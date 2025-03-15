@@ -5,7 +5,6 @@
 #include "./OrganizedToCanon.h"
 #include "./Utils.h"
 
-//class Simplex;
 
 class TaskBase {
 protected:
@@ -16,6 +15,13 @@ protected:
 
 public:
 	TaskBase(bool isMin) {
+		isMinTask = isMin;
+	}
+
+	TaskBase(vector<RestrictBase*>& s_conditions, vector<RestrictBase*>& x_conditions, vector<double>& goal, bool isMin){
+		this->s_conditions = s_conditions;
+		this->x_conditions = x_conditions;
+		this->goal = goal;
 		isMinTask = isMin;
 	}
 	void addRestriction(RestrictBase* condition) {
