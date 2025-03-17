@@ -5,9 +5,22 @@
 
 using namespace std;
 
+enum Type {
+	eqw,
+	low,
+	big
+};
+
 
 class EqwRestrict;
 class BiggerStrongRestrict;
+
+//class ConditionBase {
+//protected:
+//	vector<RestrictBase*> x_condition;
+//public:
+//
+//}; // тут бы по-хорошему реализовать логику подстановки x_cond чтобы не хардкодить
 
 class RestrictBase {
 public:
@@ -15,6 +28,10 @@ public:
 	vector<double> row_matr;
 	RestrictBase(vector<double>&& row_matr, double param) : row_matr(std::move(row_matr)), param(param) {}
 	virtual bool checkCorrect(vector<double> x) = 0;
+
+	virtual ~RestrictBase() = default;
+	virtual RestrictBase* clone() const = 0;
+
 
 	virtual RestrictBase* multiplyOnNumber(double number) {
 		param *= number;
@@ -27,8 +44,9 @@ public:
 	virtual EqwRestrict* toEqw() = 0;
 	virtual RestrictBase* toLower() = 0;
 	virtual RestrictBase* toBigger() = 0;
+	virtual Type getType() = 0;
 
-	int getIndexNaturalValue() {
+	int getIndexNotZeroValue() {
 		for (int i = 0; i < row_matr.size(); i++) {
 			if (row_matr[i] != 0)
 				return i;
@@ -57,13 +75,20 @@ public:
 		return true;
 	}
 
+	Type getType() override {
+		return Type::eqw;
+	}
+
 	RestrictBase* multiplyOnNumber(double number) override {
 		RestrictBase* res = RestrictBase::multiplyOnNumber(number);
 		return new EqwRestrict(move(res->row_matr), res->param);
 	}
 
+	EqwRestrict* clone() const override {
+		return new EqwRestrict(*this);
+	}
+
 	EqwRestrict* toEqw() override {
-		row_matr.push_back(0);
 		return this;
 	}
 
@@ -95,19 +120,26 @@ public:
 		return true;
 	}
 
+	Type getType() override {
+		return Type::low;
+	}
+
 	RestrictBase* multiplyOnNumber(double number) override;
 
 	EqwRestrict* toEqw() override {
 		row_matr.push_back(1);
 		return new EqwRestrict(move(row_matr), param);
 	}
+	RestrictBase* toBigger() {
+		return multiplyOnNumber(-1);
+	}
+
+	LowerStrongRestrict* clone() const override {
+		return new LowerStrongRestrict(*this);
+	}
 
 	RestrictBase* toLower() {
 		return this;
-	}
-
-	RestrictBase* toBigger() {
-		return multiplyOnNumber(-1);
 	}
 
 	void print() {
@@ -136,6 +168,14 @@ public:
 			return new BiggerStrongRestrict(move(res->row_matr), res->param);
 		else
 			return new LowerStrongRestrict(move(res->row_matr), res->param);
+	}
+
+	Type getType() override {
+		return Type::big;
+	}
+
+	BiggerStrongRestrict* clone() const override {
+		return new BiggerStrongRestrict(*this);
 	}
 
 	EqwRestrict* toEqw() override {

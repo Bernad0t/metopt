@@ -18,12 +18,17 @@ public:
 		isMinTask = isMin;
 	}
 
-	TaskBase(vector<RestrictBase*>& s_conditions, vector<RestrictBase*>& x_conditions, vector<double>& goal, bool isMin){
-		this->s_conditions = s_conditions;
-		this->x_conditions = x_conditions;
+	TaskBase(vector<RestrictBase*>& s_conditions, vector<RestrictBase*>& x_conditions, vector<double>& goal, bool isMin) {
+		for (auto& cond : s_conditions) {
+			this->s_conditions.push_back(cond->clone());
+		}
+		for (auto& cond : x_conditions) {
+			this->x_conditions.push_back(cond->clone());
+		}
 		this->goal = goal;
 		isMinTask = isMin;
 	}
+
 	void addRestriction(RestrictBase* condition) {
 		s_conditions.push_back(condition);
 	}
